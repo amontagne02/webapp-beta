@@ -3,6 +3,7 @@ import path from "path";
 import os from "os";
 import { fileURLToPath } from "url";
 import posRoutes from "./routes/pos.routes.js";
+import ventasRoutes from "./routes/ventas.routes.js";
 
 // Obtener __dirname equivalente en ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Rutas
 app.use(posRoutes);
+app.use(ventasRoutes);
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "public")));
