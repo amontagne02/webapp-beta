@@ -1,0 +1,351 @@
+// ============================================
+// POS MÓVIL - Lógica de la aplicación
+// ============================================
+
+// Configuración
+const API_URL = window.location.origin;
+
+// Estado de la aplicación
+let productos = [];
+let carrito = [];
+
+// Elementos del DOM
+const productosContainer = document.getElementById('productosContainer');
+const carritoLista = document.getElementById('carritoLista');
+const totalItems = document.getElementById('totalItems');
+const totalPrecio = document.getElementById('totalPrecio');
+const totalPagarSpan = document.getElementById('totalPagar');
+const efectivoInput = document.getElementById('efectivo');
+const transferenciaInput = document.getElementById('transferencia');
+const btnPagar = document.getElementById('btnPagar');
+const mensajeDiv = document.getElementById('mensaje');
+const searchInput = document.getElementById('searchInput');
+
+// ============================================
+// 1. CARGAR PRODUCTOS
+// ============================================
+async function cargarProductos() {
+  try {
+    mostrarMensaje("Cargando productos...", "info");
+
+    console.log('📡 Solicitando productos a:', `${API_URL}/productos`);
+    
+    const response = await fetch(`${API_URL}/productos`);
+    console.log('📡 Respuesta status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📦 Datos recibidos:', data);
+
+    if (Array.isArray(data)) {
+      productos = data;
+    } else if (data.productos && Array.isArray(data.productos)) {
+      productos = data.productos;
+    } else {
+      console.error('Formato de datos inesperado:', data);
+      productos = [];
+    }
+
+    console.log(`📦 ${productos.length} productos procesados`);
+    
+    renderizarProductos(productos);
+    mostrarMensaje(`${productos.length} productos cargados`, "exito", 2000);
+    
+  } catch (error) {
+    console.error("❌ Error detallado:", error);
+    mostrarMensaje("Error al cargar productos: " + error.message, "error");
+    productosContainer.innerHTML =
+      '<p class="error">No se pudieron cargar los productos</p>';
+  }
+}
+
+// ============================================
+// 2. RENDERIZAR PRODUCTOS
+// ============================================
+function renderizarProductos(lista) {
+  if (!lista || lista.length === 0) {
+    productosContainer.innerHTML = '<p class="info">No hay productos disponibles</p>';
+    return;
+  }
+  
+  console.log('🎨 Renderizando productos:', lista);
+  
+  let html = '';
+  
+  for (let i = 0; i < lista.length; i++) {
+    const producto = lista[i];
+    
+    const codigo = producto.codigo || '';
+    const nombre = producto.producto || producto.nombre || 'Producto';
+    const precio = producto.precio || 0;
+    const stock = producto.disponibilidad || producto.stock || 0;
+    
+    const codigoEscapado = codigo.replace(/"/g, '&quot;');
+    
+    html += '<div class="producto-card" data-codigo="' + codigo + '">';
+    html += '<div class="producto-info">';
+    html += '<h3>' + nombre + '</h3>';
+    html += '<div class="precio">$' + Math.round(precio) + '</div>';
+    html += '<div class="stock">Stock: ' + stock + '</div>';
+    html += '</div>';
+    html += '<div class="producto-actions">';
+    html += '<button class="btn-cantidad" onclick="agregarAlCarrito(\'' + codigoEscapado + '\')">+</button>';
+    html += '<span class="cantidad-seleccionada" id="cant-' + codigo + '">0</span>';
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  productosContainer.innerHTML = html;
+  console.log('✅ HTML generado correctamente');
+}
+
+// ============================================
+// 3. AGREGAR AL CARRITO
+// ============================================
+window.agregarAlCarrito = (codigo) => {
+  console.log('➕ Agregando producto con código:', codigo);
+  
+  const producto = productos.find(p => p.codigo == codigo);
+  
+  if (!producto) {
+    console.error('❌ Producto no encontrado:', codigo);
+    mostrarMensaje('Error: producto no encontrado', 'error');
+    return;
+  }
+  
+  const itemExistente = carrito.find(item => item.codigo === codigo);
+  const stock = producto.disponibilidad || producto.stock || 0;
+  
+  if (itemExistente) {
+    if (itemExistente.cantidad < stock) {
+      itemExistente.cantidad++;
+    } else {
+      mostrarMensaje('Stock insuficiente', 'error', 2000);
+      return;
+    }
+  } else {
+    carrito.push({
+      codigo: codigo,
+      nombre: producto.producto || producto.nombre,
+      precio: producto.precio || 0,
+      cantidad: 1,
+      maxStock: stock
+    });
+  }
+  
+  actualizarVistaCarrito();
+  actualizarContadorProducto(codigo);
+};
+
+// ============================================
+// 4. ELIMINAR DEL CARRITO
+// ============================================
+window.eliminarItemCarrito = (codigo) => {
+  console.log('🗑️ Eliminando producto con código:', codigo);
+  
+  carrito = carrito.filter(item => item.codigo !== codigo);
+  
+  actualizarVistaCarrito();
+  actualizarContadorProducto(codigo);
+};
+
+// ============================================
+// 5. ACTUALIZAR CONTADOR DE PRODUCTO
+// ============================================
+function actualizarContadorProducto(codigo) {
+  const item = carrito.find(i => i.codigo === codigo);
+  const span = document.getElementById(`cant-${codigo}`);
+  if (span) {
+    span.textContent = item ? item.cantidad : 0;
+  }
+}
+
+// ============================================
+// 6. ACTUALIZAR VISTA DEL CARRITO
+// ============================================
+function actualizarVistaCarrito() {
+  const totalProductos = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+  const totalPagar = carrito.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
+  
+  totalItems.textContent = `${totalProductos} ${totalProductos === 1 ? 'producto' : 'productos'}`;
+  totalPrecio.textContent = `$${Math.round(totalPagar)}`;
+  totalPagarSpan.textContent = `$${Math.round(totalPagar)}`;
+  
+  if (carrito.length === 0) {
+    carritoLista.innerHTML = '<li style="text-align: center; padding: 24px; color: var(--text-secondary);">🛒 Carrito vacío</li>';
+    btnPagar.disabled = true;
+    cerrarCarrito();
+  } else {
+    let html = '';
+    carrito.forEach(item => {
+      const codigoEscapado = item.codigo.replace(/"/g, '&quot;');
+      const subtotal = Math.round(item.cantidad * item.precio);
+      
+      html += `
+        <li class="carrito-item">
+          <div class="carrito-item-info">
+            <div class="carrito-item-nombre">${item.nombre}</div>
+            <div class="carrito-item-detalle">${item.cantidad} x $${Math.round(item.precio)}</div>
+          </div>
+          <span class="carrito-item-subtotal">$${subtotal}</span>
+          <button class="btn-eliminar-item" onclick="eliminarItemCarrito('${codigoEscapado}')">✕</button>
+        </li>
+      `;
+    });
+    
+    carritoLista.innerHTML = html;
+    btnPagar.disabled = false;
+  }
+  
+  calcularPago();
+}
+
+// ============================================
+// 7. CÁLCULO DE PAGO
+// ============================================
+function calcularPago() {
+  const total = carrito.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
+  const efectivo = parseInt(efectivoInput.value) || 0;
+  const transferencia = parseInt(transferenciaInput.value) || 0;
+  
+  const pagado = efectivo + transferencia;
+  const diferencia = pagado - total;
+  
+  btnPagar.classList.remove('exacto', 'falta', 'vuelto');
+  
+  if (Math.abs(diferencia) < 0.01) {
+    btnPagar.textContent = 'Pagar ✓';
+    btnPagar.classList.add('exacto');
+    btnPagar.disabled = false;
+  } else if (diferencia > 0) {
+    btnPagar.textContent = `Vuelto $${Math.round(diferencia)}`;
+    btnPagar.classList.add('vuelto');
+    btnPagar.disabled = false;
+  } else {
+    btnPagar.textContent = `Faltan $${Math.round(Math.abs(diferencia))}`;
+    btnPagar.classList.add('falta');
+    btnPagar.disabled = true;
+  }
+}
+
+// ============================================
+// 8. FINALIZAR VENTA
+// ============================================
+async function finalizarVenta() {
+  if (carrito.length === 0) {
+    mostrarMensaje('Agrega productos al carrito', 'error');
+    return;
+  }
+  
+  const efectivo = parseInt(efectivoInput.value) || 0;
+  const transferencia = parseInt(transferenciaInput.value) || 0;
+  const total = carrito.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
+  
+  if (Math.abs((efectivo + transferencia) - total) > 0.01) {
+    mostrarMensaje('El pago no cubre el total exacto', 'error');
+    return;
+  }
+  
+  try {
+    btnPagar.disabled = true;
+    btnPagar.textContent = 'Procesando...';
+    
+    const ventaData = {
+      pago: { efectivo, transferencia },
+      productos: carrito.map(item => ({
+        codigo: item.codigo,
+        nombre: item.nombre,
+        cantidad: item.cantidad,
+        precio: item.precio
+      }))
+    };
+    
+    console.log('📤 Enviando venta:', ventaData);
+    
+    const response = await fetch(`${API_URL}/ventas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ventaData)
+    });
+    
+    const result = await response.json();
+    console.log('📥 Respuesta del servidor:', result);
+    
+    if (response.ok) {
+      mostrarMensaje(`✅ Venta #${result.facturaId} registrada`, 'exito');
+      carrito = [];
+      efectivoInput.value = '0';
+      transferenciaInput.value = '0';
+      actualizarVistaCarrito();
+      cargarProductos();
+      cerrarCarrito();
+    } else {
+      mostrarMensaje(result.error || 'Error en la venta', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Error:', error);
+    mostrarMensaje('Error de conexión', 'error');
+  } finally {
+    btnPagar.disabled = false;
+    calcularPago();
+  }
+}
+
+// ============================================
+// 9. UTILIDADES
+// ============================================
+function mostrarMensaje(texto, tipo, duracion = 3000) {
+  mensajeDiv.textContent = texto;
+  mensajeDiv.className = `mensaje ${tipo}`;
+  mensajeDiv.classList.remove('hidden');
+  
+  if (duracion > 0) {
+    setTimeout(() => {
+      mensajeDiv.classList.add('hidden');
+    }, duracion);
+  }
+}
+
+window.toggleCarrito = () => {
+  const contenido = document.getElementById('carritoContenido');
+  const icono = document.getElementById('carritoIcono');
+  contenido.classList.toggle('abierto');
+  icono.classList.toggle('abierto');
+};
+
+window.cerrarCarrito = () => {
+  const contenido = document.getElementById('carritoContenido');
+  const icono = document.getElementById('carritoIcono');
+  contenido.classList.remove('abierto');
+  icono.classList.remove('abierto');
+};
+
+// ============================================
+// 10. FILTRO DE BÚSQUEDA
+// ============================================
+searchInput.addEventListener('input', (e) => {
+  const termino = e.target.value.toLowerCase();
+  const filtrados = productos.filter(p => 
+    (p.producto || p.nombre || '').toLowerCase().includes(termino) ||
+    (p.codigo || '').toString().includes(termino)
+  );
+  renderizarProductos(filtrados);
+});
+
+// ============================================
+// 11. EVENT LISTENERS
+// ============================================
+efectivoInput.addEventListener('input', calcularPago);
+transferenciaInput.addEventListener('input', calcularPago);
+btnPagar.addEventListener('click', finalizarVenta);
+
+// ============================================
+// 12. INICIALIZACIÓN
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+  cargarProductos();
+  actualizarVistaCarrito();
+});

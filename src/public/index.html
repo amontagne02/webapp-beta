@@ -1,166 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>App Excel Local</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        }
-        body {
-            margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        h1 {
-            margin: 0 0 8px 0;
-            font-size: 24px;
-            color: #333;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 24px;
-            font-size: 16px;
-        }
-        .status {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 500;
-            text-align: center;
-        }
-        .ip-box {
-            background: #f0f0f0;
-            padding: 16px;
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 18px;
-            text-align: center;
-            word-break: break-all;
-        }
-        button {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background: #1976d2;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        .resultado {
-            margin-top: 20px;
-            padding: 16px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            border-left: 4px solid #2196f3;
-            white-space: pre-wrap;
-            font-family: monospace;
-            font-size: 14px;
-            display: none;
-        }
-        .error {
-            border-left-color: #f44336;
-            background: #ffebee;
-            color: #c62828;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>POS Móvil - Dark</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h1>📱 Excel Local App</h1>
-            <div class="subtitle">Conectado a: <span id="ipDisplay">cargando...</span></div>
-            
-            <div class="status" id="status">
-                ✅ Servidor conectado
-            </div>
-            
-            <div style="margin: 24px 0;">
-                <div class="ip-box" id="ipAddress">
-                    esperando...
-                </div>
-            </div>
-            
-            <button id="btnProbar">
-                🔄 Probar conexión con servidor
-            </button>
-            
-            <div class="resultado" id="resultado"></div>
-        </div>
-        
-        <div class="card">
-            <h3>📋 Instrucciones</h3>
-            <ul style="line-height: 1.6; padding-left: 20px;">
-                <li>Asegúrate que PC y móvil estén en misma WiFi</li>
-                <li>La IP arriba es la de tu servidor</li>
-                <li>Prueba el botón para verificar conexión</li>
-            </ul>
-        </div>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>POS Móvil</h1>
+      <div class="subtitle">Ventas con Excel</div>
+    </header>
+
+    <!-- Mensajes -->
+    <div id="mensaje" class="mensaje hidden"></div>
+
+    <!-- Buscador -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Buscar producto..." autocomplete="off">
     </div>
 
-    <script>
-        // Detectar IP del servidor (es la misma que cargó la página)
-        const serverIP = window.location.hostname;
-        const serverPort = window.location.port || '3000';
-        const baseURL = `http://${serverIP}:${serverPort}`;
+    <!-- Lista de productos -->
+    <div id="productosContainer" class="productos-grid">
+      <div class="loading">Cargando productos...</div>
+    </div>
+
+    <!-- Carrito flotante mejorado -->
+    <div class="carrito-flotante" id="carritoFlotante">
+      <div class="carrito-header" onclick="toggleCarrito()">
+        <div class="carrito-resumen">
+          <span class="carrito-items" id="totalItems">0 productos</span>
+          <span class="carrito-total" id="totalPrecio">$0</span>
+        </div>
+        <span class="carrito-icono" id="carritoIcono">▼</span>
+      </div>
+      
+      <div class="carrito-contenido" id="carritoContenido">
+        <ul class="carrito-lista" id="carritoLista"></ul>
         
-        document.getElementById('ipDisplay').textContent = serverIP;
-        document.getElementById('ipAddress').textContent = `${serverIP}:${serverPort}`;
-        
-        // Botón de prueba
-        document.getElementById('btnProbar').addEventListener('click', async () => {
-            const btn = document.getElementById('btnProbar');
-            const resultado = document.getElementById('resultado');
-            const originalText = btn.textContent;
-            
-            btn.textContent = '⏳ Probando...';
-            btn.disabled = true;
-            resultado.style.display = 'none';
-            resultado.className = 'resultado';
-            
-            try {
-                const response = await fetch(`${baseURL}/api/test`);
-                const data = await response.json();
-                
-                resultado.textContent = JSON.stringify(data, null, 2);
-                resultado.style.display = 'block';
-                resultado.classList.remove('error');
-            } catch (error) {
-                resultado.textContent = `❌ Error de conexión:\n${error.message}\n\nVerifica que el servidor esté corriendo y accesible.`;
-                resultado.style.display = 'block';
-                resultado.classList.add('error');
-            } finally {
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
-        });
-    </script>
+        <div class="pago-form">
+          <div class="input-group">
+            <label>Efectivo ($)</label>
+            <input type="number" id="efectivo" min="0" step="1" value="0" placeholder="0">
+          </div>
+          
+          <div class="input-group">
+            <label>Transferencia ($)</label>
+            <input type="number" id="transferencia" min="0" step="1" value="0" placeholder="0">
+          </div>
+          
+          <div class="total-pagar">
+            <span>Total:</span>
+            <span id="totalPagar">$0</span>
+          </div>
+          
+          <button class="btn-pagar" id="btnPagar" disabled>Pagar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
 </body>
 </html>
