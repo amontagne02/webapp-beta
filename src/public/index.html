@@ -11,7 +11,7 @@
     <!-- Header -->
     <header class="header">
       <h1>POS Móvil</h1>
-      <div class="subtitle">Ventas con Excel</div>
+      <div class="subtitle">Gestión Plus</div>
     </header>
 
     <!-- Mensajes -->
@@ -27,40 +27,41 @@
       <div class="loading">Cargando productos...</div>
     </div>
 
-    <!-- Carrito flotante mejorado -->
-    <div class="carrito-flotante" id="carritoFlotante">
-      <div class="carrito-header" onclick="toggleCarrito()">
-        <div class="carrito-resumen">
-          <span class="carrito-items" id="totalItems">0 productos</span>
-          <span class="carrito-total" id="totalPrecio">$0</span>
-        </div>
-        <span class="carrito-icono" id="carritoIcono">▼</span>
+    <!-- Carrito flotante mejorado CON BOTONES -/+ -->
+<div class="carrito-flotante" id="carritoFlotante">
+  <div class="carrito-header" onclick="toggleCarrito()">
+    <div class="carrito-resumen">
+      <span class="carrito-items" id="totalItems">0 productos</span>
+      <span class="carrito-total" id="totalPrecio">$0</span>
+    </div>
+    <span class="carrito-icono" id="carritoIcono">▼</span>
+  </div>
+  
+  <div class="carrito-contenido" id="carritoContenido">
+    <!-- Lista de productos en el carrito -->
+    <ul class="carrito-lista" id="carritoLista"></ul>
+    
+    <!-- Formulario de pago -->
+    <div class="pago-form">
+      <div class="input-group">
+        <label>Efectivo ($)</label>
+        <input type="number" id="efectivo" min="0" step="1" value="0" placeholder="0">
       </div>
       
-      <div class="carrito-contenido" id="carritoContenido">
-        <ul class="carrito-lista" id="carritoLista"></ul>
-        
-        <div class="pago-form">
-          <div class="input-group">
-            <label>Efectivo ($)</label>
-            <input type="number" id="efectivo" min="0" step="1" value="0" placeholder="0">
-          </div>
-          
-          <div class="input-group">
-            <label>Transferencia ($)</label>
-            <input type="number" id="transferencia" min="0" step="1" value="0" placeholder="0">
-          </div>
-          
-          <div class="total-pagar">
-            <span>Total:</span>
-            <span id="totalPagar">$0</span>
-          </div>
-          
-          <button class="btn-pagar" id="btnPagar" disabled>Pagar</button>
-        </div>
+      <div class="input-group">
+        <label>Transferencia ($)</label>
+        <input type="number" id="transferencia" min="0" step="1" value="0" placeholder="0">
       </div>
+      
+      <div class="total-pagar">
+        <span>Total:</span>
+        <span id="totalPagar">$0</span>
+      </div>
+      
+      <button class="btn-pagar" id="btnPagar" disabled>Pagar</button>
     </div>
   </div>
+</div>
 
   <script src="/js/app.js"></script>
 </body>

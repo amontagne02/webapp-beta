@@ -270,3 +270,62 @@ export const obtenerHojaPorNombre = (workbook, nombreHoja) => {
     throw error;
   }
 };
+
+// ============================================
+// 8. ACTUALIZAR STOCK DE UN PRODUCTO
+// ============================================
+export const actualizarStock = (workbook, codigoProducto, cantidadVendida) => {
+  try {
+    // Obtener la hoja de productos
+    const hojaProductos = workbook.sheet("Productos");
+    if (!hojaProductos) {
+      throw new Error('No se encontró la hoja "Productos"');
+    }
+
+    // Buscar el producto por código
+    let fila = 2; // Empezamos después de encabezados
+    let encontrado = false;
+    let stockActual = 0;
+
+    while (true) {
+      const codigoCelda = hojaProductos.cell(`A${fila}`).value();
+      if (!codigoCelda) break; // Fin de los datos
+
+      // Comparar códigos (como string para evitar problemas)
+      if (codigoCelda.toString() === codigoProducto.toString()) {
+        encontrado = true;
+
+        const columnaStock = "C";
+        stockActual = hojaProductos.cell(`${columnaStock}${fila}`).value() || 0;
+
+        // Calcular nuevo stock
+        const nuevoStock = Math.max(0, stockActual - cantidadVendida);
+
+        // Actualizar celda
+        hojaProductos.cell(`${columnaStock}${fila}`).value(nuevoStock);
+
+        console.log(
+          `📦 Producto ${codigoProducto}: stock ${stockActual} → ${nuevoStock}`,
+        );
+        break;
+      }
+
+      fila++;
+    }
+
+    if (!encontrado) {
+      throw new Error(
+        `Producto ${codigoProducto} no encontrado en hoja Productos`,
+      );
+    }
+
+    return {
+      encontrado,
+      stockActual,
+      nuevoStock: stockActual - cantidadVendida,
+    };
+  } catch (error) {
+    console.error("❌ Error actualizando stock:", error.message);
+    throw error;
+  }
+};

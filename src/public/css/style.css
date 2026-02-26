@@ -19,7 +19,13 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    "Google Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
 }
 
 body {
@@ -431,4 +437,232 @@ body {
   text-align: center;
   padding: 40px;
   color: var(--text-secondary);
+}
+
+/* Botones de cantidad en el carrito */
+.btn-cantidad-carrito {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background-color: var(--bg-input);
+  border: none;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-cantidad-carrito:hover {
+  background-color: #4a4a4a;
+}
+
+.btn-cantidad-carrito:active {
+  transform: scale(0.95);
+}
+
+/* Ajuste para la visualización del carrito */
+.carrito-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #3c3c3c;
+}
+
+.carrito-item-info {
+  flex: 1;
+}
+
+.carrito-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cantidad.disminuir {
+  background-color: #5a5a5a;
+}
+
+.btn-cantidad.disminuir:hover {
+  background-color: #6a6a6a;
+}
+
+.btn-cantidad:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ===== BOTONES DE CANTIDAD (PRODUCTOS Y CARRITO) ===== */
+
+/* Base para todos los botones circulares */
+.btn-cantidad,
+.btn-cantidad-carrito {
+  width: 48px;
+  height: 48px;
+  border-radius: 40px;
+  border: none;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón AUMENTAR (+) - Azul Google */
+.btn-cantidad:not(.btn-disminuir),
+.btn-cantidad-carrito:last-of-type {
+  background: linear-gradient(145deg, #8ab4f8, #6d9eeb);
+  color: #000;
+  font-weight: 700;
+}
+
+.btn-cantidad:not(.btn-disminuir):hover,
+.btn-cantidad-carrito:last-of-type:hover {
+  background: linear-gradient(145deg, #9bc2ff, #7daeff);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(138, 180, 248, 0.4);
+}
+
+.btn-cantidad:not(.btn-disminuir):active,
+.btn-cantidad-carrito:last-of-type:active {
+  transform: scale(0.95);
+}
+
+/* Botón DISMINUIR (-) - Gris */
+.btn-disminuir,
+.btn-cantidad-carrito:first-of-type {
+  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+  color: #fff;
+}
+
+.btn-disminuir:hover,
+.btn-cantidad-carrito:first-of-type:hover {
+  background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
+  transform: scale(1.05);
+}
+
+.btn-disminuir:active,
+.btn-cantidad-carrito:first-of-type:active {
+  transform: scale(0.95);
+}
+
+/* Botón ELIMINAR (✕) - Rojo */
+.btn-eliminar-item {
+  background: none;
+  border: none;
+  color: #f28b82;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 40px;
+  transition: all 0.2s;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-eliminar-item:hover {
+  background-color: rgba(242, 139, 130, 0.15);
+  color: #ff9e98;
+  transform: scale(1.1);
+}
+
+.btn-eliminar-item:active {
+  transform: scale(0.95);
+}
+
+/* Contador de cantidad */
+.cantidad-seleccionada {
+  font-size: 20px;
+  font-weight: 600;
+  min-width: 48px;
+  text-align: center;
+  color: var(--accent);
+  background-color: var(--bg-secondary);
+  padding: 8px 0;
+  border-radius: 40px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== BOTONES EN CARRITO (versión más compacta) ===== */
+
+/* Ajuste para botones más pequeños en carrito */
+.carrito-item .btn-cantidad-carrito {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+}
+
+.carrito-item .cantidad-seleccionada {
+  font-size: 16px;
+  min-width: 36px;
+  padding: 4px 0;
+}
+
+/* Contenedor de controles en carrito */
+.carrito-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-card);
+  padding: 4px 8px;
+  border-radius: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== BOTÓN PAGAR (con estados) ===== */
+.btn-pagar {
+  width: 100%;
+  padding: 18px;
+  border-radius: 40px;
+  border: none;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-pagar.exacto {
+  background: linear-gradient(145deg, #81c995, #5bb974);
+  color: #000;
+}
+
+.btn-pagar.exacto:hover {
+  background: linear-gradient(145deg, #8ed9a5, #6aca83);
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(129, 201, 149, 0.4);
+}
+
+.btn-pagar.falta {
+  background: linear-gradient(145deg, #f28b82, #e06b60);
+  color: #fff;
+}
+
+.btn-pagar.vuelto {
+  background: linear-gradient(145deg, #fdd663, #f7c948);
+  color: #000;
+}
+
+.btn-pagar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-pagar:not(:disabled):active {
+  transform: scale(0.98);
 }
