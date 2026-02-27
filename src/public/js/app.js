@@ -128,6 +128,7 @@ function renderizarProductos(lista) {
     const nombre = producto.producto || producto.nombre || "Producto";
     const precio = producto.precio || 0;
     const stock = producto.disponibilidad || producto.stock || 0;
+    const sinStock = stock <= 0;
 
     // Verificar si el producto está en el carrito
     const itemEnCarrito = carrito.find((item) => item.codigo === codigo);
@@ -139,7 +140,11 @@ function renderizarProductos(lista) {
     html += '<div class="producto-info">';
     html += "<h3>" + nombre + "</h3>";
     html += '<div class="precio">$' + Math.round(precio) + "</div>";
-    html += '<div class="stock">Stock: ' + stock + "</div>";
+    html +=
+      '<div class="stock">Stock: ' +
+      stock +
+      (sinStock ? " (Sin stock)" : "") +
+      "</div>";
     html += "</div>";
 
     html += '<div class="producto-actions">';
@@ -165,8 +170,11 @@ function renderizarProductos(lista) {
       "</span>";
 
     // Botón AUMENTAR (+)
+    const puedeSumar = stock > 0 && cantidadEnCarrito < stock;
     html +=
-      '<button class="btn-cantidad" onclick="agregarAlCarrito(\'' +
+      '<button class="btn-cantidad" ' +
+      (puedeSumar ? "" : "disabled ") +
+      'onclick="agregarAlCarrito(\'' +
       codigoEscapado +
       "')\">+</button>";
 
@@ -194,6 +202,10 @@ window.agregarAlCarrito = (codigo) => {
 
   const itemExistente = carrito.find((item) => item.codigo === codigo);
   const stock = producto.disponibilidad || producto.stock || 0;
+  if (stock <= 0) {
+    mostrarMensaje("Sin stock", "error", 2000);
+    return;
+  }
 
   if (itemExistente) {
     if (itemExistente.cantidad < stock) {
