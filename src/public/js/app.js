@@ -22,6 +22,23 @@ const mensajeDiv = document.getElementById("mensaje");
 const searchInput = document.getElementById("searchInput");
 
 // ============================================
+// VARIABLES DEL MODAL
+// ============================================
+let resolverModal = null;
+
+// ============================================
+// FUNCIÓN PARA MOSTRAR MODAL DE VUELTO
+// ============================================
+function mostrarModalVuelto(total, pagado, vuelto) {
+  // Usar confirm nativo que SÍ funciona
+  const mensaje = `💰 VUELTO A ENTREGAR: $${vuelto}\n\n` +
+                  `Total: $${total}\n` +
+                  `Pagado: $${pagado}\n\n` +
+                  `¿Confirmas que entregaste el vuelto?`;
+  
+  return Promise.resolve(confirm(mensaje));
+}
+// ============================================
 // 1. CARGAR PRODUCTOS
 // ============================================
 async function cargarProductos() {
@@ -349,24 +366,53 @@ function calcularPago() {
 // ============================================
 // 8. FINALIZAR VENTA
 // ============================================
+
 async function finalizarVenta() {
   if (carrito.length === 0) {
     mostrarMensaje("Agrega productos al carrito", "error");
     return;
   }
 
-  const efectivo = parseInt(efectivoInput.value) || 0;
-  const transferencia = parseInt(transferenciaInput.value) || 0;
+  let efectivo = parseInt(efectivoInput.value) || 0;
+  let transferencia = parseInt(transferenciaInput.value) || 0;
   const total = carrito.reduce(
     (sum, item) => sum + item.cantidad * item.precio,
     0,
   );
 
-  if (Math.abs(efectivo + transferencia - total) > 0.01) {
-    mostrarMensaje("El pago no cubre el total exacto", "error");
+  const pagado = efectivo + transferencia;
+  let vuelto = pagado - total;
+
+  // 1. Si falta dinero, NO permitir
+  if (vuelto < 0) {
+    mostrarMensaje(`❌ Faltan $${Math.abs(vuelto)}`, "error");
     return;
   }
 
+  // 2. Si hay vuelto, preguntar con modal
+  if (vuelto > 0) {
+    const confirmar = await mostrarModalVuelto(total, pagado, vuelto);
+
+    if (!confirmar) {
+      mostrarMensaje("Venta cancelada", "info", 2000);
+      return;
+    }
+
+    // 3. AJUSTAR EFECTIVO AL MONTO EXACTO
+    if (efectivo >= vuelto) {
+      efectivo = efectivo - vuelto;
+    } else {
+      efectivo = 0;
+      transferencia = transferencia - (vuelto - efectivo);
+    }
+
+    efectivoInput.value = efectivo;
+    transferenciaInput.value = transferencia;
+
+    console.log(`💰 Vuelto entregado. Nuevo efectivo: $${efectivo}`);
+  }
+
+  // 4. Procesar venta con los montos ajustados
   try {
     btnPagar.disabled = true;
     btnPagar.textContent = "Procesando...";
@@ -381,7 +427,7 @@ async function finalizarVenta() {
       })),
     };
 
-    console.log("📤 Enviando venta:", ventaData);
+    console.log("📤 Enviando venta (montos ajustados):", ventaData);
 
     const response = await fetch(`${API_URL}/ventas`, {
       method: "POST",
@@ -393,7 +439,8 @@ async function finalizarVenta() {
     console.log("📥 Respuesta del servidor:", result);
 
     if (response.ok) {
-      mostrarMensaje(`✅ Venta #${result.facturaId} registrada`, "exito");
+      mostrarMensaje(`✅ Venta #${result.facturaId} registrada`, "exito", 3000);
+
       carrito = [];
       efectivoInput.value = "0";
       transferenciaInput.value = "0";
@@ -411,7 +458,6 @@ async function finalizarVenta() {
     calcularPago();
   }
 }
-
 // ============================================
 // 9. UTILIDADES
 // ============================================
@@ -468,3 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarProductos();
   actualizarVistaCarrito();
 });
+
+function probarModalManual() {
+  mostrarModalVuelto(1000, 1100, 100);
+}

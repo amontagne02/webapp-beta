@@ -3,8 +3,10 @@
   --bg-secondary: #1e1e1e;
   --bg-card: #2d2d2d;
   --bg-input: #3c3c3c;
-  --accent: #8ab4f8;
-  --accent-hover: #a9c9ff;
+  --accent: #ff6300;
+  --accent-hover: #ff8533;
+  --accent-light: #ff944d;
+  --accent-dark: #cc4f00;
   --text-primary: #e8eaed;
   --text-secondary: #9aa0a6;
   --success: #81c995;
@@ -52,6 +54,7 @@ body {
   letter-spacing: -0.5px;
   color: var(--accent);
   margin-bottom: 8px;
+  text-shadow: 0 2px 8px rgba(255, 99, 0, 0.3);
 }
 
 .header .subtitle {
@@ -134,38 +137,78 @@ body {
   gap: 12px;
 }
 
-.btn-cantidad {
+/* ===== BOTONES DE CANTIDAD (PRODUCTOS Y CARRITO) ===== */
+
+/* Base para todos los botones circulares */
+.btn-cantidad,
+.btn-cantidad-carrito {
   width: 48px;
   height: 48px;
   border-radius: 40px;
   border: none;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
   font-size: 24px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.btn-cantidad:hover {
-  background-color: #4a4a4a;
+/* Botón AUMENTAR (+) - Naranja corporativo */
+.btn-cantidad:not(.btn-disminuir),
+.btn-cantidad-carrito:last-of-type {
+  background: linear-gradient(145deg, #ff6300, #e65900);
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.btn-cantidad:active {
+.btn-cantidad:not(.btn-disminuir):hover,
+.btn-cantidad-carrito:last-of-type:hover {
+  background: linear-gradient(145deg, #ff731a, #ff6300);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 99, 0, 0.5);
+}
+
+.btn-cantidad:not(.btn-disminuir):active,
+.btn-cantidad-carrito:last-of-type:active {
   transform: scale(0.95);
 }
 
-.cantidad-seleccionada {
-  font-size: 18px;
-  font-weight: 600;
-  min-width: 40px;
-  text-align: center;
-  color: var(--accent);
+/* Botón DISMINUIR (-) - Gris oscuro */
+.btn-disminuir,
+.btn-cantidad-carrito:first-of-type {
+  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+  color: #fff;
 }
 
+.btn-disminuir:hover,
+.btn-cantidad-carrito:first-of-type:hover {
+  background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
+  transform: scale(1.05);
+}
+
+.btn-disminuir:active,
+.btn-cantidad-carrito:first-of-type:active {
+  transform: scale(0.95);
+}
+
+/* Contador de cantidad */
+.cantidad-seleccionada {
+  font-size: 20px;
+  font-weight: 600;
+  min-width: 48px;
+  text-align: center;
+  color: var(--accent);
+  background-color: var(--bg-secondary);
+  padding: 8px 0;
+  border-radius: 40px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== CARRITO FLOTANTE ===== */
 .carrito-flotante {
   position: fixed;
   bottom: 0;
@@ -217,6 +260,7 @@ body {
 .carrito-icono {
   font-size: 24px;
   transition: transform 0.3s;
+  color: var(--accent);
 }
 
 .carrito-icono.abierto {
@@ -273,21 +317,34 @@ body {
   text-align: right;
 }
 
+/* Botón ELIMINAR (✕) - Rojo */
 .btn-eliminar-item {
   background: none;
   border: none;
   color: var(--error);
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 40px;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-eliminar-item:hover {
-  background-color: rgba(242, 139, 130, 0.1);
+  background-color: rgba(242, 139, 130, 0.15);
+  color: #ff9e98;
+  transform: scale(1.1);
 }
 
+.btn-eliminar-item:active {
+  transform: scale(0.95);
+}
+
+/* ===== PAGO ===== */
 .pago-form {
   display: flex;
   flex-direction: column;
@@ -332,291 +389,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 20px;
   font-size: 18px;
   font-weight: 600;
   background-color: var(--bg-secondary);
   border-radius: 40px;
-  padding: 16px 20px;
   margin: 8px 0;
 }
 
 .total-pagar span:last-child {
   color: var(--accent);
   font-size: 24px;
-}
-
-.btn-pagar {
-  width: 100%;
-  padding: 18px;
-  border-radius: 40px;
-  border: none;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.btn-pagar.exacto {
-  background-color: var(--success);
-  color: #000;
-}
-
-.btn-pagar.falta {
-  background-color: var(--error);
-  color: #fff;
-}
-
-.btn-pagar.vuelto {
-  background-color: var(--warning);
-  color: #000;
-}
-
-.btn-pagar:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-pagar:not(:disabled):active {
-  transform: scale(0.98);
-}
-
-.mensaje {
-  padding: 16px;
-  border-radius: 40px;
-  margin-bottom: 16px;
-  text-align: center;
-  font-weight: 500;
-  position: fixed;
-  top: 20px;
-  left: 16px;
-  right: 16px;
-  max-width: 568px;
-  margin: 0 auto;
-  z-index: 2000;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.mensaje.exito {
-  background-color: #1e3a2e;
-  color: var(--success);
-  border: 1px solid var(--success);
-}
-
-.mensaje.error {
-  background-color: #3e2a2a;
-  color: var(--error);
-  border: 1px solid var(--error);
-}
-
-.mensaje.info {
-  background-color: #2a3e4a;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-}
-
-.hidden {
-  display: none;
-}
-
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--text-secondary);
-}
-
-/* Botones de cantidad en el carrito */
-.btn-cantidad-carrito {
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  background-color: var(--bg-input);
-  border: none;
-  color: var(--text-primary);
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.btn-cantidad-carrito:hover {
-  background-color: #4a4a4a;
-}
-
-.btn-cantidad-carrito:active {
-  transform: scale(0.95);
-}
-
-/* Ajuste para la visualización del carrito */
-.carrito-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #3c3c3c;
-}
-
-.carrito-item-info {
-  flex: 1;
-}
-
-.carrito-item-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-cantidad.disminuir {
-  background-color: #5a5a5a;
-}
-
-.btn-cantidad.disminuir:hover {
-  background-color: #6a6a6a;
-}
-
-.btn-cantidad:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-/* ===== BOTONES DE CANTIDAD (PRODUCTOS Y CARRITO) ===== */
-
-/* Base para todos los botones circulares */
-.btn-cantidad,
-.btn-cantidad-carrito {
-  width: 48px;
-  height: 48px;
-  border-radius: 40px;
-  border: none;
-  font-size: 24px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Botón AUMENTAR (+) - Azul Google */
-.btn-cantidad:not(.btn-disminuir),
-.btn-cantidad-carrito:last-of-type {
-  background: linear-gradient(145deg, #8ab4f8, #6d9eeb);
-  color: #000;
-  font-weight: 700;
-}
-
-.btn-cantidad:not(.btn-disminuir):hover,
-.btn-cantidad-carrito:last-of-type:hover {
-  background: linear-gradient(145deg, #9bc2ff, #7daeff);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(138, 180, 248, 0.4);
-}
-
-.btn-cantidad:not(.btn-disminuir):active,
-.btn-cantidad-carrito:last-of-type:active {
-  transform: scale(0.95);
-}
-
-/* Botón DISMINUIR (-) - Gris */
-.btn-disminuir,
-.btn-cantidad-carrito:first-of-type {
-  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
-  color: #fff;
-}
-
-.btn-disminuir:hover,
-.btn-cantidad-carrito:first-of-type:hover {
-  background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
-  transform: scale(1.05);
-}
-
-.btn-disminuir:active,
-.btn-cantidad-carrito:first-of-type:active {
-  transform: scale(0.95);
-}
-
-/* Botón ELIMINAR (✕) - Rojo */
-.btn-eliminar-item {
-  background: none;
-  border: none;
-  color: #f28b82;
-  font-size: 22px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 40px;
-  transition: all 0.2s;
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-eliminar-item:hover {
-  background-color: rgba(242, 139, 130, 0.15);
-  color: #ff9e98;
-  transform: scale(1.1);
-}
-
-.btn-eliminar-item:active {
-  transform: scale(0.95);
-}
-
-/* Contador de cantidad */
-.cantidad-seleccionada {
-  font-size: 20px;
-  font-weight: 600;
-  min-width: 48px;
-  text-align: center;
-  color: var(--accent);
-  background-color: var(--bg-secondary);
-  padding: 8px 0;
-  border-radius: 40px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* ===== BOTONES EN CARRITO (versión más compacta) ===== */
-
-/* Ajuste para botones más pequeños en carrito */
-.carrito-item .btn-cantidad-carrito {
-  width: 36px;
-  height: 36px;
-  font-size: 20px;
-}
-
-.carrito-item .cantidad-seleccionada {
-  font-size: 16px;
-  min-width: 36px;
-  padding: 4px 0;
-}
-
-/* Contenedor de controles en carrito */
-.carrito-item-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: var(--bg-card);
-  padding: 4px 8px;
-  border-radius: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* ===== BOTÓN PAGAR (con estados) ===== */
@@ -665,4 +448,107 @@ body {
 
 .btn-pagar:not(:disabled):active {
   transform: scale(0.98);
+}
+
+/* ===== MENSAJES ===== */
+.mensaje {
+  padding: 16px;
+  border-radius: 40px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 500;
+  position: fixed;
+  top: 20px;
+  left: 16px;
+  right: 16px;
+  max-width: 568px;
+  margin: 0 auto;
+  z-index: 2000;
+  animation: slideDown 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 99, 0, 0.3);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mensaje.exito {
+  background-color: #1e3a2e;
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.mensaje.error {
+  background-color: #3e2a2a;
+  color: var(--error);
+  border: 1px solid var(--error);
+}
+
+.mensaje.info {
+  background-color: #2a1e14;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.hidden {
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+/* ===== AJUSTES PARA MÓVIL ===== */
+
+/* Ajuste para botones más pequeños en carrito */
+.carrito-item .btn-cantidad-carrito {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+}
+
+.carrito-item .cantidad-seleccionada {
+  font-size: 16px;
+  min-width: 36px;
+  padding: 4px 0;
+}
+
+/* Contenedor de controles en carrito */
+.carrito-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-card);
+  padding: 4px 8px;
+  border-radius: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Utilidades */
+.btn-cantidad:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
