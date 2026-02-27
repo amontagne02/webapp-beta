@@ -62,6 +62,32 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de confirmacion de vuelto -->
+<div id="modalVuelto" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalVueltoTitulo">
+  <div class="modal-card">
+    <h2 id="modalVueltoTitulo">Confirmar vuelto</h2>
+    <p id="modalVueltoMensaje" class="modal-mensaje"></p>
+    <div class="modal-detalles">
+      <div class="modal-detalle">
+        <span>Total</span>
+        <strong id="modalTotal">$0</strong>
+      </div>
+      <div class="modal-detalle">
+        <span>Pagado</span>
+        <strong id="modalPagado">$0</strong>
+      </div>
+      <div class="modal-detalle modal-vuelto">
+        <span>Vuelto</span>
+        <strong id="modalVueltoMonto">$0</strong>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" id="modalCancelar" class="modal-btn modal-btn-secundario">Cancelar</button>
+      <button type="button" id="modalConfirmar" class="modal-btn modal-btn-primario">Confirmar entrega</button>
+    </div>
+  </div>
+</div>
 <script src="/js/app.js"></script>
  
 </body>

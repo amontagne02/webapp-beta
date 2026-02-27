@@ -497,6 +497,115 @@ body {
   border: 1px solid var(--accent);
 }
 
+/* ===== MODAL VUELTO ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 3000;
+}
+
+.modal-card {
+  width: min(420px, 100%);
+  background: var(--bg-card);
+  border: 1px solid #3c3c3c;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  padding: 20px;
+  animation: modalPop 0.18s ease-out;
+}
+
+.modal-card h2 {
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 22px;
+}
+
+.modal-mensaje {
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.modal-detalles {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.modal-detalle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.modal-detalle strong {
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.modal-detalle.modal-vuelto strong {
+  color: var(--accent);
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.modal-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal-btn:active {
+  transform: scale(0.98);
+}
+
+.modal-btn-secundario {
+  background: #3a3a3a;
+  color: #fff;
+}
+
+.modal-btn-secundario:hover {
+  background: #4a4a4a;
+}
+
+.modal-btn-primario {
+  background: linear-gradient(145deg, #ff6300, #e65900);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 99, 0, 0.35);
+}
+
+.modal-btn-primario:hover {
+  opacity: 0.95;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .hidden {
   display: none;
 }

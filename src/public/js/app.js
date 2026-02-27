@@ -20,6 +20,13 @@ const transferenciaInput = document.getElementById("transferencia");
 const btnPagar = document.getElementById("btnPagar");
 const mensajeDiv = document.getElementById("mensaje");
 const searchInput = document.getElementById("searchInput");
+const modalVuelto = document.getElementById("modalVuelto");
+const modalVueltoMensaje = document.getElementById("modalVueltoMensaje");
+const modalTotal = document.getElementById("modalTotal");
+const modalPagado = document.getElementById("modalPagado");
+const modalVueltoMonto = document.getElementById("modalVueltoMonto");
+const modalCancelar = document.getElementById("modalCancelar");
+const modalConfirmar = document.getElementById("modalConfirmar");
 
 // ============================================
 // VARIABLES DEL MODAL
@@ -30,13 +37,32 @@ let resolverModal = null;
 // FUNCIÓN PARA MOSTRAR MODAL DE VUELTO
 // ============================================
 function mostrarModalVuelto(total, pagado, vuelto) {
-  // Usar confirm nativo que SÍ funciona
-  const mensaje = `💰 VUELTO A ENTREGAR: $${vuelto}\n\n` +
-                  `Total: $${total}\n` +
-                  `Pagado: $${pagado}\n\n` +
-                  `¿Confirmas que entregaste el vuelto?`;
-  
-  return Promise.resolve(confirm(mensaje));
+  if (!modalVuelto) {
+    return Promise.resolve(
+      confirm(
+        `Vuelto a entregar: $${Math.round(vuelto)}. Confirmas que entregaste el vuelto?`,
+      ),
+    );
+  }
+
+  return new Promise((resolve) => {
+    resolverModal = resolve;
+    modalVueltoMensaje.textContent =
+      "Verifica el monto y confirma la entrega del vuelto.";
+    modalTotal.textContent = `$${Math.round(total)}`;
+    modalPagado.textContent = `$${Math.round(pagado)}`;
+    modalVueltoMonto.textContent = `$${Math.round(vuelto)}`;
+    modalVuelto.classList.remove("hidden");
+    modalConfirmar.focus();
+  });
+}
+
+function cerrarModalVuelto(confirmado) {
+  if (!modalVuelto || resolverModal === null) return;
+  const resolver = resolverModal;
+  resolverModal = null;
+  modalVuelto.classList.add("hidden");
+  resolver(confirmado);
 }
 // ============================================
 // 1. CARGAR PRODUCTOS
@@ -486,6 +512,26 @@ window.cerrarCarrito = () => {
   contenido.classList.remove("abierto");
   icono.classList.remove("abierto");
 };
+
+if (modalCancelar) {
+  modalCancelar.addEventListener("click", () => cerrarModalVuelto(false));
+}
+
+if (modalConfirmar) {
+  modalConfirmar.addEventListener("click", () => cerrarModalVuelto(true));
+}
+
+if (modalVuelto) {
+  modalVuelto.addEventListener("click", (e) => {
+    if (e.target === modalVuelto) cerrarModalVuelto(false);
+  });
+}
+
+document.addEventListener("keydown", (e) => {
+  if (!modalVuelto || modalVuelto.classList.contains("hidden")) return;
+  if (e.key === "Escape") cerrarModalVuelto(false);
+  if (e.key === "Enter") cerrarModalVuelto(true);
+});
 
 // ============================================
 // 10. FILTRO DE BÚSQUEDA
