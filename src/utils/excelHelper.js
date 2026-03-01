@@ -74,10 +74,10 @@ const fechaATimestampExcel = (fecha) => {
 
   // Ajuste por el bug de Excel (considera 1900 como bisiesto)
   // Si la fecha es posterior al 28/2/1900, sumamos 1
-  const fechaLimite = new Date(1900, 1, 28); // 28 Feb 1900
-  const ajuste = fecha > fechaLimite ? 1 : 0;
+  //const fechaLimite = new Date(1900, 1, 28); // 28 Feb 1900
+  //const ajuste = fecha > fechaLimite ? 1 : 0;
 
-  return diffDias + 2 + ajuste; // +2 por cómo maneja JS las fechas
+  return diffDias + 2 //+ ajuste; // +2 por cómo maneja JS las fechas
 };
 
 /**
