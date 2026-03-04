@@ -4,6 +4,7 @@ import os from "os";
 import { fileURLToPath } from "url";
 import posRoutes from "./routes/pos.routes.js";
 import ventasRoutes from "./routes/ventas.routes.js";
+import * as control from "./utils/server-control.js";
 
 // Obtener __dirname equivalente en ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +31,16 @@ app.get("/api/test", (req, res) => {
   });
 });
 
+// Ruta para ver estado del servidor
+app.get("/api/estado", (req, res) => {
+  const info = control.obtenerInfoFlags();
+  res.json({
+    servidorActivo: info.existeActivo,
+    timestampInicio: info.timestampActivo,
+    flags: info,
+  });
+});
+
 // Ruta raíz
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -51,6 +62,9 @@ function obtenerIPLocal() {
 // Iniciar servidor
 app.listen(PUERTO, "0.0.0.0", () => {
   const ipLocal = obtenerIPLocal();
+  // Crear flag de servidor activo usando nuestro módulo
+  control.crearFlagActivo();
+
   console.log("\n=================================");
   console.log("🚀 Servidor iniciado (ES Modules)");
   console.log("=================================");
@@ -60,4 +74,48 @@ app.listen(PUERTO, "0.0.0.0", () => {
   console.log(`   http://${ipLocal}:${PUERTO}`);
   console.log("=================================\n");
   console.log("📂 Directorio:", __dirname);
+});
+
+// Intervalo que revisa cada 2 segundos si debe detenerse
+const intervaloRevision = setInterval(() => {
+  if (control.debeDetenerse()) {
+    console.log("🛑 Señal de detención recibida. Apagando servidor...");
+
+    // Limpiar flag de detener
+    control.limpiarFlagDetener();
+
+    // Eliminar flag activo
+    control.eliminarFlagActivo();
+
+    // Detener el intervalo
+    clearInterval(intervaloRevision);
+
+    // Cerrar servidor
+    server.close(() => {
+      console.log("✅ Servidor apagado correctamente");
+      process.exit(0);
+    });
+  }
+}, 2000);
+
+// Manejar señales del sistema (Ctrl+C)
+process.on("SIGINT", () => {
+  console.log("\n🛑 Recibida señal SIGINT (Ctrl+C)");
+  control.limpiarTodosLosFlags();
+  clearInterval(intervaloRevision);
+  server.close(() => {
+    console.log("✅ Servidor apagado por usuario");
+    process.exit(0);
+  });
+});
+
+// Manejar cierre inesperado
+process.on("SIGTERM", () => {
+  console.log("🛑 Recibida señal SIGTERM");
+  control.limpiarTodosLosFlags();
+  clearInterval(intervaloRevision);
+  server.close(() => {
+    console.log("✅ Servidor apagado");
+    process.exit(0);
+  });
 });

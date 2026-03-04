@@ -1,7 +1,7 @@
 // ============================================
 // CONTROLLER: Productos (POS) - Versión RANGO
 // ============================================
-// Endpoint: GET /api/productos
+// Endpoint: GET /productos
 // Lee desde un rango de celdas (no tabla formal)
 // ============================================
 
