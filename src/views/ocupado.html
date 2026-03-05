@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POS Móvil - Ocupado</title>
+    <style>
+      body {
+        background: #0f0f0f;
+        color: white;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 400px;
+        text-align: center;
+      }
+      h1 {
+        color: #ff6300;
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+      .icon {
+        font-size: 64px;
+        margin: 20px 0;
+      }
+      p {
+        color: #ccc;
+        font-size: 18px;
+        line-height: 1.5;
+        margin: 20px 0;
+      }
+      .ip {
+        color: #888;
+        font-size: 14px;
+        margin-top: 40px;
+        padding: 10px;
+        border-top: 1px solid #333;
+      }
+      .refrescar {
+        background: #ff6300;
+        color: black;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 40px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+      .refrescar:hover {
+        background: #ff8533;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">🔒</div>
+      <h1>POS Ocupado</h1>
+      <p>Ya hay un cliente activo usando el sistema.</p>
+      <p>Espera a que termine su sesión o contacta al administrador.</p>
+      <div class="ip" id="ipDisplay"></div>
+      <button class="refrescar" onclick="location.reload()">
+        🔄 Reintentar
+      </button>
+    </div>
+    <script>
+      // Mostrar IP si está disponible
+      fetch("/api/estado-publico")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.haySesion) {
+            document.getElementById("ipDisplay").innerHTML =
+              "Hay una sesión activa en este momento";
+          }
+        })
+        .catch(() => {});
+    </script>
+  </body>
+</html>

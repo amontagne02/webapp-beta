@@ -103,10 +103,19 @@ body {
   align-items: center;
   transition: transform 0.1s;
   border: 1px solid #3c3c3c;
+  will-change: transform, opacity;
 }
 
 .producto-card:active {
   transform: scale(0.99);
+}
+
+.productos-grid {
+  transition: opacity 0.12s ease-out;
+}
+
+.productos-grid.filtrando {
+  opacity: 0.88;
 }
 
 .producto-info {

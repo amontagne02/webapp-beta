@@ -71,9 +71,13 @@ async function cargarProductos() {
   try {
     mostrarMensaje("Cargando productos...", "info");
 
-    console.log("📡 Solicitando productos a:", `${API_URL}/productos`);
+    console.log("📡 Solicitando productos a:", `${API_URL}/api/productos`);
 
-    const response = await fetch(`${API_URL}/productos`);
+    const response = await fetch(`${API_URL}/api/productos`, {
+      headers: {
+        "x-session-token": window.SESSION_TOKEN || "",
+      },
+    });
     console.log("📡 Respuesta status:", response.status);
 
     if (!response.ok) {
@@ -467,9 +471,12 @@ async function finalizarVenta() {
 
     console.log("📤 Enviando venta (montos ajustados):", ventaData);
 
-    const response = await fetch(`${API_URL}/ventas`, {
+    const response = await fetch(`${API_URL}/api/ventas`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-session-token": window.SESSION_TOKEN || "",
+      },
       body: JSON.stringify(ventaData),
     });
 
@@ -548,14 +555,47 @@ document.addEventListener("keydown", (e) => {
 // ============================================
 // 10. FILTRO DE BÚSQUEDA
 // ============================================
-searchInput.addEventListener("input", (e) => {
-  const termino = e.target.value.toLowerCase();
+const FILTRO_DEBOUNCE_MS = 140;
+let filtroTimer = null;
+let filtroRaf = 0;
+let ultimoTermino = "";
+
+function aplicarFiltro(termino) {
+  if (termino === ultimoTermino) return;
+  ultimoTermino = termino;
+
   const filtrados = productos.filter(
     (p) =>
       (p.producto || p.nombre || "").toLowerCase().includes(termino) ||
       (p.codigo || "").toString().includes(termino),
   );
+
   renderizarProductos(filtrados);
+}
+
+searchInput.addEventListener("input", (e) => {
+  const termino = e.target.value.toLowerCase().trim();
+
+  if (filtroTimer) {
+    clearTimeout(filtroTimer);
+  }
+
+  if (!productosContainer.classList.contains("filtrando")) {
+    productosContainer.classList.add("filtrando");
+  }
+
+  filtroTimer = setTimeout(() => {
+    if (filtroRaf) {
+      cancelAnimationFrame(filtroRaf);
+    }
+
+    filtroRaf = requestAnimationFrame(() => {
+      aplicarFiltro(termino);
+      setTimeout(() => {
+        productosContainer.classList.remove("filtrando");
+      }, 160);
+    });
+  }, FILTRO_DEBOUNCE_MS);
 });
 
 // ============================================
