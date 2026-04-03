@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import {
   abrirExcel,
   generarFacturaIdExcel,
@@ -5,6 +8,9 @@ import {
   actualizarStock,
   guardarExcel,
 } from "../utils/excelHelper.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const crearVenta = async (req, res) => {
   try {
@@ -32,6 +38,30 @@ export const crearVenta = async (req, res) => {
         pagado: totalPagado,
       });
     }
+
+    // ============================================
+    // FUNCIÓN: EscribirEnLog
+    // Guarda la venta en ventas.log para que Excel la importe
+    // ============================================
+    function escribirEnLog(facturaId, fechaHora, total, cantidadProductos) {
+  try {
+    const rutaLog = path.join(__dirname, '..', '..', 'data', 'ventas.log');
+    
+    // Verificar/crear carpeta data
+    const dataDir = path.join(__dirname, '..', '..', 'data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    
+    // Una línea por venta (solo para contar)
+    const linea = `${facturaId},${fechaHora},${total},${cantidadProductos}\n`;
+    fs.appendFileSync(rutaLog, linea, 'utf8');
+    
+    console.log(`📝 Log escrito: ${facturaId}`);
+  } catch (error) {
+    console.error('❌ Error escribiendo log:', error.message);
+  }
+}
 
     // ===== PROCESAR VENTA (TODO O NADA) =====
     const { workbook, hoja } = await abrirExcel();
@@ -85,6 +115,9 @@ export const crearVenta = async (req, res) => {
 
     // 5. Guardar TODO (un solo save)
     await guardarExcel(workbook);
+
+    // 6. ESCRIBIR EN LOG para Excel
+    escribirEnLog(facturaId, fechaHora, totalCalculado, productos.length);
 
     // Respuesta exitosa
     res.status(201).json({

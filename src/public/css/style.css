@@ -41,6 +41,7 @@ body {
 .container {
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .header {
@@ -92,6 +93,7 @@ body {
   flex-direction: column;
   gap: 12px;
   margin-bottom: 24px;
+  width: 100%;
 }
 
 .producto-card {
@@ -104,6 +106,7 @@ body {
   transition: transform 0.1s;
   border: 1px solid #3c3c3c;
   will-change: transform, opacity;
+  width: 100%;
 }
 
 .producto-card:active {
@@ -126,6 +129,9 @@ body {
   font-size: 18px;
   font-weight: 500;
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .producto-info .precio {
@@ -655,18 +661,4 @@ body {
 .btn-cantidad:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: system-ui, sans-serif;
-}
-
-body {
-  min-height: 100vh;
-  background: #111;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
