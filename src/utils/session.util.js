@@ -2,7 +2,7 @@
 let tokenActivo = null;
 let ipActiva = null;
 let fechaExpiracion = null;
-const TIEMPO_EXPIRACION = 30 * 60 * 1000; // 30 minutos
+const TIEMPO_EXPIRACION = parseInt(process.env.SESSION_EXPIRATION_MS || "1800000", 10);
 
 // Obtener estado actual
 export const getSesion = () => ({

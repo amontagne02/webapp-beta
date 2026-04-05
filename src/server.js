@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import os from "os";
@@ -23,7 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PUERTO = 3000;
+const PUERTO = parseInt(process.env.PORT || "3000", 10);
 
 // Middlewares
 app.use(express.json());
@@ -104,7 +105,7 @@ function obtenerIPLocal() {
 }
 
 // Iniciar servidor
-app.listen(PUERTO, "0.0.0.0", () => {
+const server = app.listen(PUERTO, "0.0.0.0", () => {
   const ipLocal = obtenerIPLocal();
   // Crear flag de servidor activo usando nuestro módulo
   control.crearFlagActivo();
