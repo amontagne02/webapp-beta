@@ -19,7 +19,10 @@
 
     <!-- Buscador -->
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Buscar producto..." autocomplete="off">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Buscar producto..." autocomplete="off">
+        <button type="button" class="search-clear hidden" id="searchClear" aria-label="Limpiar búsqueda">&times;</button>
+      </div>
     </div>
 
     <!-- Lista de productos -->

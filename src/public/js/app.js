@@ -20,6 +20,7 @@ const transferenciaInput = document.getElementById("transferencia");
 const btnPagar = document.getElementById("btnPagar");
 const mensajeDiv = document.getElementById("mensaje");
 const searchInput = document.getElementById("searchInput");
+const searchClear = document.getElementById("searchClear");
 const modalVuelto = document.getElementById("modalVuelto");
 const modalVueltoMensaje = document.getElementById("modalVueltoMensaje");
 const modalTotal = document.getElementById("modalTotal");
@@ -231,6 +232,7 @@ window.agregarAlCarrito = (codigo) => {
   actualizarVistaCarrito();
   renderizarProductos(productos);
   actualizarContadorProducto(codigo);
+  reapplySearchFilter();
 };
 
 // ============================================
@@ -256,6 +258,7 @@ window.disminuirCantidad = (codigo) => {
   actualizarVistaCarrito();
   renderizarProductos(productos);
   actualizarContadorProducto(codigo);
+  reapplySearchFilter();
 };
 
 // ============================================
@@ -555,6 +558,32 @@ document.addEventListener("keydown", (e) => {
 // ============================================
 // 10. FILTRO DE BÚSQUEDA
 // ============================================
+function reapplySearchFilter() {
+  const termino = searchInput.value.toLowerCase().trim();
+  if (termino) {
+    ultimoTermino = "";
+    aplicarFiltro(termino);
+  }
+}
+
+function toggleClearButton() {
+  if (searchInput.value.length > 0) {
+    searchClear.classList.remove("hidden");
+  } else {
+    searchClear.classList.add("hidden");
+  }
+}
+
+function limpiarBusqueda() {
+  searchInput.value = "";
+  toggleClearButton();
+  renderizarProductos(productos);
+}
+
+if (searchClear) {
+  searchClear.addEventListener("click", limpiarBusqueda);
+}
+
 const FILTRO_DEBOUNCE_MS = 140;
 let filtroTimer = null;
 let filtroRaf = 0;
@@ -575,6 +604,7 @@ function aplicarFiltro(termino) {
 
 searchInput.addEventListener("input", (e) => {
   const termino = e.target.value.toLowerCase().trim();
+  toggleClearButton();
 
   if (filtroTimer) {
     clearTimeout(filtroTimer);
