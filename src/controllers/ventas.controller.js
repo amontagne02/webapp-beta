@@ -8,6 +8,7 @@ import {
   actualizarStock,
   guardarExcel,
 } from "../utils/excelHelper.js";
+import { fechaLocalISO, obtenerFechaActual } from "../utils/date.util.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,9 +89,10 @@ export const crearVenta = async (req, res) => {
       });
     }
 
-    // 2. Generar FacturaID
-    const facturaId = generarFacturaIdExcel(hoja);
-    const fechaHora = new Date().toISOString();
+    // 2. Generar FacturaID y FechaHora desde la MISMA referencia de tiempo
+    const ahora = obtenerFechaActual();
+    const facturaId = generarFacturaIdExcel(hoja, ahora);
+    const fechaHora = fechaLocalISO(ahora);
 
     // 3. Escribir líneas en Pendientes
     for (const producto of productos) {
