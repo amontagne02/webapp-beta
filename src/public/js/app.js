@@ -633,6 +633,31 @@ searchInput.addEventListener("input", (e) => {
 // ============================================
 efectivoInput.addEventListener("input", calcularPago);
 transferenciaInput.addEventListener("input", calcularPago);
+
+// Limpiar campo al hacer foco si tiene el valor por defecto "0"
+efectivoInput.addEventListener("focus", function() {
+  if (this.value === "0") {
+    this.value = "";
+  }
+});
+transferenciaInput.addEventListener("focus", function() {
+  if (this.value === "0") {
+    this.value = "";
+  }
+});
+
+// Restaurar "0" si el campo queda vacío al perder foco
+efectivoInput.addEventListener("blur", function() {
+  if (this.value === "") {
+    this.value = "0";
+  }
+});
+transferenciaInput.addEventListener("blur", function() {
+  if (this.value === "") {
+    this.value = "0";
+  }
+});
+
 btnPagar.addEventListener("click", finalizarVenta);
 
 // ============================================
